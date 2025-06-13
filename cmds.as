@@ -12,7 +12,7 @@ void OnInitialize()
     print("----------------------------------------------------------------------------");
     print("[SERVER] Console Commands has loaded successfully");
     print("[SERVER] By BelaRain");
-    print("[SERVER] The Repository - ");
+    print("[SERVER] The Repository - https://github.com/belarain/uerm-console-commands");
     print("----------------------------------------------------------------------------");
     print(" ");
 }
