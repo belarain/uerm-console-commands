@@ -21,12 +21,14 @@ bool OnConsole(string cmd)
 {
     if (cmd == "help")
     {
-        print("[SERVER] Console Commands:");
+        print("[SERVER] CONSOLE COMMANDS:");
         print("[SERVER] playerlist | List of players with names, IDs, IPs");
+        print("[SERVER] playerinfo [ID] | Player info");
         print("[SERVER] clear | Clear console");
         print("[SERVER] restart | Restart server");
         print("[SERVER] message [TEXT] | Message to server (in chat)");
         print("[SERVER] info | Server info");
+        print("[SERVER] kick [ID] | Kick player (That is standart command, but I make better :3)");
         return false;
     }
     if (cmd == "playerlist")
@@ -91,6 +93,33 @@ bool OnConsole(string cmd)
         return false;
     }
 
+    if (cmd == "playerinfo") { print("[SERVER] playerinfo [ID]"); return false; }
+    if (cmd.findFirst("playerinfo ") >= 0)
+    {
+        Player player = cPlayers::SelectPlayerFromId(parseInt(cmd.substr(11, cmd.length()-11)));
+        if (player == NULL) { print("[SERVER] User is not found"); return false; }
+        float x, y, z, pitch, yaw;
+        player.GetNetworkPosition(x, y, z);
+        player.GetNetworkRotation(pitch, yaw);
+
+        print("[SERVER] PLAYER INFORMATION:");
+        print("[SERVER] Name: " + player.GetName() + " | ID: " + player.GetIndex() + " | IP: " + player.GetIP() + " | SteamID: " + player.GetSteamID() + " | HWID: " + player.GetHWID() + " | Ping: " + player.GetPing());
+        print("[SERVER] Language: " +  player.GetLanguage() + " | Dead Status: " + player.IsDead() + " | Admin Status: " + player.IsAdmin() + " | Bot Status: " + player.IsBot());
+        print("[SERVER] Room: " + player.GetRoom() + " | Room Position: " + x + " " + y + " " + z + " " + " | Room Rotation: " + pitch + " " + yaw);
+        return false;
+    }
+    
+    if (cmd == "kick") { print("[SERVER] kick [ID]"); return false; }
+    if (cmd.findFirst("kick ") >= 0)
+    {
+        Player player = cPlayers::SelectPlayerFromId(parseInt(cmd.substr(5, cmd.length()-5)));
+        if (player == NULL) { print("[SERVER] User is not found"); return false; }
+        
+        player.Kick(CODE_KICKED);
+        print("[SERVER] " + player.GetName() + "has been kicked");
+        return false;
+    }
+
     return true;
 }
 
@@ -104,6 +133,18 @@ namespace cPlayers
     void OnDisconnect(Player player)
     {
         connPlayers.removeAt(connPlayers.find(player)); // Remove player from connPlayers
+    }
+
+    Player SelectPlayerFromId(int id)
+    {
+        Player player = NULL;
+        for (int i = 0; i < connPlayers.size(); ++i)
+        {
+            player = connPlayers[i];
+            if (player.GetIndex() == id) break;
+        }
+        if (player != NULL) return player;
+        return NULL;
     }
 }
 
