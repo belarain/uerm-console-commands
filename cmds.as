@@ -93,6 +93,14 @@ bool OnConsole(string cmd)
         return false;
     }
 
+    if (cmd == "createbot") { print("[SERVER] createbot [NAME]"); return false; }
+    if (cmd.findFirst("createbot ") >= 0)
+    {
+        world.CreateBot(cmd.substr(10, cmd.length()-10));
+        print("[SERVER] Bot has been created with name: " + cmd.substr(10, cmd.length()-10));
+        return false;
+    }
+
     if (cmd == "playerinfo") { print("[SERVER] playerinfo [ID]"); return false; }
     if (cmd.findFirst("playerinfo ") >= 0)
     {
@@ -115,8 +123,8 @@ bool OnConsole(string cmd)
         Player player = cPlayers::SelectPlayerFromId(parseInt(cmd.substr(5, cmd.length()-5)));
         if (player == NULL) { print("[SERVER] User is not found"); return false; }
         
+        print("[SERVER] " + player.GetName() + " has been kicked");
         player.Kick(CODE_KICKED);
-        print("[SERVER] " + player.GetName() + "has been kicked");
         return false;
     }
 
