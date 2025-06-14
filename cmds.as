@@ -17,18 +17,32 @@ void OnInitialize()
     print(" ");
 }
 
-bool OnConsole(string cmd)
+bool OnConsole(string input)
 {
+    array<string>@ values = input.split(" ");
+    if (@values == null || values.empty()) return true;
+    string cmd = values[0];
+    
+
     if (cmd == "help")
     {
-        print("[SERVER] CONSOLE COMMANDS:");
-        print("[SERVER] playerlist | List of players with names, IDs, IPs");
-        print("[SERVER] playerinfo [ID] | Player info");
-        print("[SERVER] clear | Clear console");
+        print("[SERVER] STANDART CONSOLE COMMANDS:");
+        print("[SERVER] players | List of players");
         print("[SERVER] restart | Restart server");
-        print("[SERVER] message [TEXT] | Message to server (in chat)");
+        print("[SERVER] shutdown | Shutdown server");
+        print("[SERVER] scripts | List of scripts");
+        print("[SERVER] loadscript [FILENAME] [NAME] | Load script by its path and set name");
+        print("[SERVER] removescript [FILENAME OR NAME] | Remove script by path or name");
+        print("[SERVER] announce [TEXT] | Message to server (with [Server] prefix)");
+        print("[SERVER] kick [ID] | Kick player by ID");
+        print("----------------------------------------------------------------------------");
+        print("[SERVER] SCRIPT CONSOLE COMMANDS:");
+        print("[SERVER] playerlist | List of players with names, IDs, IPs");
+        print("[SERVER] playerinfo [ID] | Player info by ID");
+        print("[SERVER] clear | Clear console");
+        print("[SERVER] message [TEXT] | Message to server (without [Server] prefix)");
         print("[SERVER] info | Server info");
-        print("[SERVER] kick [ID] | Kick player (That is standart command, but I make better :3)");
+        print("[SERVER] createbot [NAME] | Create AI with name");
         return false;
     }
     if (cmd == "playerlist")
@@ -52,7 +66,6 @@ bool OnConsole(string cmd)
         return false;
     }
 
-    if (cmd == "restart") { server.Restart(); return false; }
     if (cmd == "info")
     {
         print("[SERVER] Setting \"hostname\": " + server.hostname);
@@ -86,25 +99,28 @@ bool OnConsole(string cmd)
         return false;
     }
     
-    if (cmd == "message") { print("[SERVER] message [TEXT]"); return false; }
-    if (cmd.findFirst("message ") >= 0)
+    if (cmd == "message" && input.length() == 7) { print("[SERVER] message [TEXT]"); return false; }
+    else if (cmd == "message")
     {
-        chat.Send(cmd.substr(8, cmd.length()-8));
+        string text = values[1];
+        chat.Send(text);
         return false;
     }
 
-    if (cmd == "createbot") { print("[SERVER] createbot [NAME]"); return false; }
-    if (cmd.findFirst("createbot ") >= 0)
+    if (cmd == "createbot" && input.length() == 9) { print("[SERVER] createbot [NAME]"); return false; }
+    else if (cmd == "createbot")
     {
-        world.CreateBot(cmd.substr(10, cmd.length()-10));
-        print("[SERVER] Bot has been created with name: " + cmd.substr(10, cmd.length()-10));
+        string text = values[1];
+        world.CreateBot(text);
+        print("[SERVER] Bot has been created with name: " + text);
         return false;
     }
 
-    if (cmd == "playerinfo") { print("[SERVER] playerinfo [ID]"); return false; }
-    if (cmd.findFirst("playerinfo ") >= 0)
+    if (cmd == "playerinfo" && input.length() == 10) { print("[SERVER] playerinfo [ID]"); return false; }
+    else if (cmd == "playerinfo")
     {
-        Player player = cPlayers::SelectPlayerFromId(parseInt(cmd.substr(11, cmd.length()-11)));
+        string id = values[1];
+        Player player = cPlayers::SelectPlayerFromId(parseInt(id));
         if (player == NULL) { print("[SERVER] User is not found"); return false; }
         float x, y, z, pitch, yaw;
         player.GetNetworkPosition(x, y, z);
@@ -114,17 +130,6 @@ bool OnConsole(string cmd)
         print("[SERVER] Name: " + player.GetName() + " | ID: " + player.GetIndex() + " | IP: " + player.GetIP() + " | SteamID: " + player.GetSteamID() + " | HWID: " + player.GetHWID() + " | Ping: " + player.GetPing());
         print("[SERVER] Language: " +  player.GetLanguage() + " | Dead Status: " + player.IsDead() + " | Admin Status: " + player.IsAdmin() + " | Bot Status: " + player.IsBot());
         print("[SERVER] Room: " + player.GetRoom() + " | Room Position: " + x + " " + y + " " + z + " " + " | Room Rotation: " + pitch + " " + yaw);
-        return false;
-    }
-    
-    if (cmd == "kick") { print("[SERVER] kick [ID]"); return false; }
-    if (cmd.findFirst("kick ") >= 0)
-    {
-        Player player = cPlayers::SelectPlayerFromId(parseInt(cmd.substr(5, cmd.length()-5)));
-        if (player == NULL) { print("[SERVER] User is not found"); return false; }
-        
-        print("[SERVER] " + player.GetName() + " has been kicked");
-        player.Kick(CODE_KICKED);
         return false;
     }
 
