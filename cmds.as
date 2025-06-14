@@ -99,26 +99,26 @@ bool OnConsole(string input)
         return false;
     }
     
-    if (cmd == "message" && input.length() == 7) { print("[SERVER] message [TEXT]"); return false; }
-    else if (cmd == "message")
+    if (cmd == "message")
     {
-        string text = values[1];
+        if (values.size() < 2) { print("[SERVER] message [TEXT]"); return false; }
+        string text = input.substr(input.findFirst(values[1]), input.length()-values[0].length()-1);
         chat.Send(text);
         return false;
     }
 
-    if (cmd == "createbot" && input.length() == 9) { print("[SERVER] createbot [NAME]"); return false; }
-    else if (cmd == "createbot")
+    if (cmd == "createbot")
     {
-        string text = values[1];
+        if (values.size() < 2) { print("[SERVER] createbot [NAME]"); return false; }
+        string text = input.substr(input.findFirst(values[1]), input.length()-values[0].length()-1);
         world.CreateBot(text);
         print("[SERVER] Bot has been created with name: " + text);
         return false;
     }
 
-    if (cmd == "playerinfo" && input.length() == 10) { print("[SERVER] playerinfo [ID]"); return false; }
-    else if (cmd == "playerinfo")
+    if (cmd == "playerinfo")
     {
+        if (values.size() < 2) { print("[SERVER] playerinfo [ID]"); return false; }
         string id = values[1];
         Player player = cPlayers::SelectPlayerFromId(parseInt(id));
         if (player == NULL) { print("[SERVER] User is not found"); return false; }
